@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from paralympic_app.config import Config
 
 
 # Create a global SQLAlchemy object
@@ -9,18 +10,20 @@ db = SQLAlchemy()
 ma = Marshmallow()
 
 
-def create_app(config_object):
+def create_app(config_pbject=Config):
     """Create and configure the Flask app"""
     app = Flask(__name__)
     # Config parameters are in config.py
-    app.config.from_object(config_object)
+    app.config.from_object(config_pbject)
 
     # Uses a helper function to initialise extensions
     initialize_extensions(app)
 
+
     with app.app_context():
+        from paralympic_app.models import Event, Region
         # Include the routes from routes.py
-        from . import routes
+        from paralympic_app import routes
 
         db.create_all()
 
@@ -33,7 +36,3 @@ def initialize_extensions(app):
     db.init_app(app)
     # Flask-Marshmallow
     ma.init_app(app)
-
-
-# At end to prevent circular imports
-from paralympic_app.models import Event, Region
